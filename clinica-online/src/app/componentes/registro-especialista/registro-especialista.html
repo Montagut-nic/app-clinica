@@ -1,0 +1,218 @@
+<div class="container py-4">
+    <a
+        routerLink="/inicio"
+        class="volver-button"
+        aria-label="Volver a la página de inicio"
+      >
+        Volver al inicio
+      </a>
+    <div class="card shadow-sm">
+        <div class="card-header bg-light d-flex align-items-center gap-2">
+            <i class="bi bi-person-plus"></i>
+            <h5 class="mb-0">
+                Registro Especialista
+            </h5>
+        </div>
+
+        <div class="card-body">
+
+            <form #f="ngForm" novalidate>
+                <!-- Datos personales -->
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">
+                            Nombre
+                        </label>
+                        <input class="form-control" name="nombre" [(ngModel)]="nombre" required #nombreNg="ngModel"
+                            [class.is-invalid]="
+                    nombreNg.invalid && (nombreNg.touched || f.submitted)
+                  " />
+                        <div class="invalid-feedback">
+                            Nombre es requerido.
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">
+                            Apellido
+                        </label>
+                        <input class="form-control" name="apellido" [(ngModel)]="apellido" required
+                            #apellidoNg="ngModel" [class.is-invalid]="
+                    apellidoNg.invalid && (apellidoNg.touched || f.submitted)
+                  " />
+                        <div class="invalid-feedback">
+                            Apellido es requerido.
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">
+                            Edad
+                        </label>
+                        <input type="number" class="form-control" name="edad" [(ngModel)]="edad" min="1" required
+                            #edadNg="ngModel" [class.is-invalid]="
+                    edadNg.invalid && (edadNg.touched || f.submitted)
+                  " />
+                        <div class="invalid-feedback">
+                            <ng-container *ngIf="edadNg.errors?.['required']">
+                                Edad es requerida.
+                            </ng-container>
+                            <ng-container *ngIf="edadNg.errors?.['min']">
+                                Edad debe ser mayor a 0.
+                            </ng-container>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">
+                            DNI
+                        </label>
+                        <input class="form-control" name="dni" [(ngModel)]="dni" required #dniNg="ngModel"
+                            [class.is-invalid]="
+                    dniNg.invalid && (dniNg.touched || f.submitted)
+                  " />
+                        <div class="invalid-feedback">
+                            DNI es requerido.
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="my-4" />
+
+                <!-- Credenciales -->
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">
+                            Correo Electrónico
+                        </label>
+                        <input type="email" class="form-control" name="email" [(ngModel)]="email" required email
+                            #emailNg="ngModel" [class.is-invalid]="
+                    emailNg.invalid && (emailNg.touched || f.submitted)
+                  " />
+                        <div class="invalid-feedback">
+                            <ng-container *ngIf="emailNg.errors?.['required']">
+                                Correo Electrónico es requerido.
+                            </ng-container>
+                            <ng-container *ngIf="emailNg.errors?.['email']">
+                                Ingresa un correo electrónico válido.
+                            </ng-container>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">
+                            Contraseña
+                        </label>
+                        <div class="input-group">
+                            <input [type]="'password'" class="form-control" name="password" [(ngModel)]="password"
+                                required minlength="6" #pwdNg="ngModel" [class.is-invalid]="
+                      pwdNg.invalid && (pwdNg.touched || f.submitted)
+                    " />
+                            <span class="input-group-text">
+                                <i class="bi bi-shield-lock"></i>
+                            </span>
+                            <div class="invalid-feedback">
+                                <ng-container *ngIf="pwdNg.errors?.['required']">
+                                    Contraseña es requerida.
+                                </ng-container>
+                                <ng-container *ngIf="pwdNg.errors?.['minlength']">
+                                    La contraseña debe tener al menos 6 caracteres.
+                                </ng-container>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                Foto de perfil
+                            </label>
+                            <input type="file" class="form-control" (change)="onFileChange($event)" accept="image/*" />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                Especialidades
+                            </label>
+
+                            <div class="specialty-multiselect">
+                                <button type="button" class="specialty-multiselect-toggle"
+                                    [class.open]="specialtyDropdownOpen" (click)="toggleSpecialtyDropdown()">
+                                    <span *ngIf="
+                          selectedSpecialtiesLabels().length;
+                          else specialtiesPlaceholder
+                        ">
+                                        {{ selectedSpecialtiesLabels().join(", ") }}
+                                    </span>
+
+                                    <ng-template #specialtiesPlaceholder>
+                                        <span class="specialty-multiselect-placeholder">
+                                            Seleccioná una o varias especialidades.
+                                        </span>
+                                    </ng-template>
+
+                                    <i class="bi bi-chevron-down ms-auto small text-muted"></i>
+                                </button>
+
+                                <div class="specialty-multiselect-dropdown" *ngIf="specialtyDropdownOpen">
+                                    <div class="specialty-option" *ngFor="let s of specialties()">
+                                        <label class="form-check-label">
+                                            <input type="checkbox" class="form-check-input me-2"
+                                                [checked]="isSpecialtySelected(s.id)" (change)="
+                              toggleSpecialty(s.id, $any($event.target).checked)
+                            " />
+                                            <span>{{ s.nombre }}</span>
+                                        </label>
+                                    </div>
+
+                                    <div class="specialty-multiselect-footer">
+                                        <div class="input-group input-group-sm">
+                                            <input class="form-control" [placeholder]="'Agregar nueva especialidad'"
+                                                [(ngModel)]="specialtyOtherInput" name="espNueva" />
+                                            <button type="button" class="btn btn-outline-secondary"
+                                                (click)="addSpecialty()">
+                                                <i class="bi bi-plus-lg me-1"></i>
+                                                Agregar
+                                            </button>
+                                        </div>
+                                        <div class="form-text mt-1">
+                                            Las especialidades nuevas se usan solo para este registro.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-text mt-1">
+                                Podés seleccionar una o varias especialidades marcando las casillas.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="my-4" />
+
+                <div class="mb-3" *ngIf="captchaEnabled">
+                    <label class="form-label">
+                        Captcha
+                    </label>
+                    <app-recaptcha [siteKey]="siteKey" (resolved)="onCaptchaResolved($event)"></app-recaptcha>
+                    <div class="form-text">
+                        Marcá la casilla "No soy un robot".
+                    </div>
+                </div>
+
+                <!-- Submit -->
+                <div class="d-grid mt-4">
+                    <button type="button" class="btn btn-primary btn-lg" [appCaptcha]="captchaEnabled()"
+                        [persist]="false" (captchaPassed)="submit()">
+                        <span class="spinner-border spinner-border-sm me-2" *ngIf="loading"></span>
+                        Crear cuenta
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>

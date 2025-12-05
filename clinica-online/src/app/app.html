@@ -1,0 +1,53 @@
+<main class="main">
+  @if (!(this.router.url === '/inicio')) {<nav
+    class="navbar navbar-expand-lg bg-body-tertiary px-3">
+    <a class="navbar-brand" routerLink="/inicio">
+      La Clínica OnLine
+    </a>
+
+    <div class="ms-auto d-flex align-items-center gap-2">
+      <ng-container *ngIf="
+          ready() &&
+            isLogged() &&
+            !(
+              profile()?.categoria === 'especialista' &&
+              profile()?.activado === false
+            );
+          else loggedOut
+        ">
+        <span class="text-muted">
+          Hola, {{ profile()?.nombre || "Usuario" }}
+        </span>
+
+        <a class="btn btn-outline-primary btn-sm" *ngIf="profile()?.categoria === 'admin'" routerLink="/admin/usuarios">
+          Usuarios
+        </a>
+
+        <a class="btn btn-outline-secondary btn-sm" routerLink="/perfil">
+          <i class="bi bi-person-circle me-1"></i>
+          Mi perfil
+        </a>
+
+        <button class="btn btn-warning btn-sm" (click)="logout()">
+          Cerrar sesión
+        </button>
+      </ng-container>
+
+      <ng-template #loggedOut>
+        <a class="btn btn-outline-secondary btn-sm" routerLink="/acceso">
+          Ingresar
+        </a>
+        <a class="btn btn-primary btn-sm" routerLink="/registro">
+          Registrarse
+        </a>
+
+      </ng-template>
+    </div>
+  </nav>
+}
+  <app-loader></app-loader>
+  <div class="content">
+    <router-outlet />
+  </div>
+  <footer></footer>
+</main>

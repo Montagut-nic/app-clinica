@@ -1,0 +1,214 @@
+.loader-backdrop {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(circle at top, color-mix(in srgb, var(--bright-blue) 20%, transparent), rgba(0, 0, 0, 0.6));
+  backdrop-filter: blur(6px);
+  z-index: 1000;
+}
+
+.loader-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 1.6rem 2rem 1.4rem;
+  border-radius: 1.75rem;
+  min-width: min(360px, 90vw);
+
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.94));
+  border: 1px solid color-mix(in srgb, var(--light-blue) 55%, transparent);
+  box-shadow:
+    0 22px 55px rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(255, 255, 255, 0.7);
+  overflow: hidden;
+}
+
+.loader-glow {
+  position: absolute;
+  inset: -40%;
+  background:
+    radial-gradient(circle at top left,
+      color-mix(in srgb, var(--mint-green) 55%, transparent),
+      transparent 60%),
+    radial-gradient(circle at bottom right,
+      color-mix(in srgb, var(--bright-blue) 55%, transparent),
+      transparent 70%);
+  opacity: 0.35;
+  z-index: -1;
+}
+
+.loader-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.loader-header__logo {
+  width: 52px;
+  height: 52px;
+  border-radius: 1rem;
+  object-fit: contain;
+  padding: 0.25rem 0.4rem;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--blue-green) 45%, #ffffff 55%),
+    color-mix(in srgb, var(--mint-green) 60%, #ffffff 40%)
+  );
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.9),
+    0 10px 18px rgba(0, 0, 0, 0.25);
+}
+
+.loader-header__text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.loader-title {
+  font-weight: 700;
+  font-size: clamp(1.1rem, 1.4vw, 1.3rem);
+  color: var(--blue-green);
+  letter-spacing: 0.03em;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.loader-subtitle {
+  font-size: 0.9rem;
+  color: var(--gray-700);
+  max-width: 260px;
+}
+
+.loader-center {
+  display: flex;
+  justify-content: center;
+}
+
+.loader-ring {
+  width: 72px;
+  height: 72px;
+  border-radius: 999px;
+  border: 3px solid color-mix(in srgb, var(--bright-blue) 70%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(
+    circle at 30% 20%,
+    color-mix(in srgb, var(--light-primary-color) 60%, #ffffff 40%),
+    #ffffff
+  );
+  box-shadow:
+    0 0 0 2px rgba(255, 255, 255, 0.8),
+    0 12px 25px rgba(0, 0, 0, 0.25);
+  animation: loader-pulse 1.6s ease-in-out infinite;
+}
+
+.loader-cross {
+  position: relative;
+  width: 26px;
+  height: 26px;
+}
+
+.loader-cross::before,
+.loader-cross::after {
+  content: '';
+  position: absolute;
+  background-color: var(--primary-color);
+  border-radius: 999px;
+}
+
+.loader-cross::before {
+  width: 8px;
+  height: 100%;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+}
+
+.loader-cross::after {
+  height: 8px;
+  width: 100%;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+}
+
+.loader-dots {
+  margin-top: 0.4rem;
+  display: flex;
+  justify-content: center;
+  gap: 0.45rem;
+}
+
+.loader-dots span {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--bright-blue), var(--mint-green));
+  opacity: 0.35;
+  animation: loader-bounce 0.9s infinite alternate;
+}
+
+.loader-dots span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.loader-dots span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes loader-pulse {
+  0% {
+    transform: scale(0.94);
+    box-shadow:
+      0 0 0 0 rgba(0, 122, 247, 0.4),
+      0 12px 25px rgba(0, 0, 0, 0.25);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow:
+      0 0 0 12px rgba(0, 122, 247, 0),
+      0 16px 32px rgba(0, 0, 0, 0.3);
+  }
+  100% {
+    transform: scale(0.94);
+    box-shadow:
+      0 0 0 0 rgba(0, 122, 247, 0),
+      0 12px 25px rgba(0, 0, 0, 0.25);
+  }
+}
+
+@keyframes loader-bounce {
+  from {
+    transform: translateY(0);
+    opacity: 0.3;
+  }
+  to {
+    transform: translateY(-6px);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loader-ring,
+  .loader-dots span {
+    animation-duration: 2s;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .loader-card {
+    padding: 1.4rem 1.25rem 1.3rem;
+    min-width: min(300px, 92vw);
+  }
+
+  .loader-header__logo {
+    width: 46px;
+    height: 46px;
+  }
+}

@@ -1,0 +1,95 @@
+:host {
+  display: block;
+}
+
+.title {
+  margin-bottom: clamp(12px, 2vw, 24px);
+  font-weight: 700;
+  letter-spacing: .2px;
+  text-align: center;
+}
+
+.choices {
+  width: min(920px, 100%);
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: clamp(12px, 3vw, 32px);
+  align-items: stretch;
+}
+
+.card {
+  --h: clamp(180px, 28vw, 260px); /* misma altura en ambos */
+  height: var(--h);
+  border-radius: 20px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255, 255, 255, 0.526);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  text-decoration: none;
+  color: inherit;
+  transition: transform .15s ease, background .15s ease, border-color .15s ease;
+}
+
+.card:hover,
+.card:focus-visible {
+  transform: translateY(-2px);
+  background: rgba(14, 138, 87, 0.12);
+  border-color: rgba(255, 255, 255, 0.816);
+  cursor: pointer;
+}
+
+.card img {
+  max-height: 60%;
+  max-width: 70%;
+  object-fit: contain;
+  filter: drop-shadow(0 0 6px rgba(14, 138, 87, .35));
+}
+
+.card span {
+  font-weight: 600;
+  font-size: clamp(14px, 1.5vw, 18px);
+}
+
+.logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: clamp(12px, 3vw, 28px);
+}
+
+.hero__logo {
+  width: clamp(72px, 10vw, 96px);
+  height: auto;
+  filter: drop-shadow(0 0 6px rgba(0, 0, 0, 0.25));
+}
+
+.subtitle {
+  font-size: 0.95rem;
+  color: var(--gray-700);
+  text-align: center;
+}
+
+.bienvenida-page {
+  min-height: 100vh;
+  width: max-content;
+  padding: 0px clamp(1rem, 4vw, 3rem);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(1.5rem, 4vw, 2.5rem);
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(0, 0, 0, 0.55),
+      rgba(0, 0, 0, 0.25)
+    ),
+    url('/hospital_clinica.webp') center / cover no-repeat;
+
+  color: #fff;
+}

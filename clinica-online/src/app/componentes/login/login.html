@@ -1,0 +1,62 @@
+<section class="login-page py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-sm-12 col-md-10 col-lg-8">
+                <!-- Accesos rápidos -->
+                <div class="quick-access mb-4">
+                    <div class="qa-list">
+                        <button type="button" class="qa-btn" *ngFor="let u of quickUsers" (click)="useQuick(u)">
+                            <img [src]="u.avatar" [alt]="u.label" />
+                            <div class="qa-text">
+                                <span class="qa-label">{{ u.label }}</span>
+                                <small class="qa-role">{{ u.role }}</small>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Card de login -->
+                <div class="row justify-content-center">
+                    <div class="col-sm-10 col-md-7 col-lg-5 col-xl-4">
+                        <div class="card login-card shadow-lg border-0">
+                            <div class="card-body p-4">
+                                <div class="text-center mb-4">
+                                    <div
+                                        class="login-icon rounded-circle d-inline-flex align-items-center justify-content-center mb-2">
+                                        <i class="bi bi-person-lock"></i>
+                                    </div>
+                                    <h5 class="mb-1">
+                                        Iniciar sesión
+                                    </h5>
+                                </div>
+
+                                <form (ngSubmit)="submit()">
+                                    <div class="mb-3">
+                                        <label class="form-label">
+                                            Correo electrónico
+                                        </label>
+                                        <input [(ngModel)]="email" name="email" type="email" class="form-control"
+                                            required />
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">
+                                            Contraseña
+                                        </label>
+                                        <input [(ngModel)]="password" name="password" type="password"
+                                            class="form-control" required />
+                                    </div>
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        Acceder
+                                    </button>
+                                </form>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- /Card login -->
+            </div>
+        </div>
+    </div>
+</section>

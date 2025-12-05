@@ -1,0 +1,32 @@
+@if(visible()){<div class="loader-backdrop" role="status" aria-live="polite">
+  <div class="loader-card">
+    <div class="loader-glow" aria-hidden="true"></div>
+
+    <div class="loader-header">
+      <img
+        src="/logo_min.webp"
+        alt="Logo de La Clínica Online"
+        class="loader-header__logo"
+      />
+
+      <div class="loader-header__text">
+        <p class="loader-title">La Clínica Online</p>
+        <p class="loader-subtitle">
+          {{ currentMessage }}
+        </p>
+      </div>
+    </div>
+
+    <div class="loader-center" aria-hidden="true">
+      <div class="loader-ring">
+        <div class="loader-cross"></div>
+      </div>
+    </div>
+
+    <div class="loader-dots" aria-hidden="true">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </div>
+</div>}
