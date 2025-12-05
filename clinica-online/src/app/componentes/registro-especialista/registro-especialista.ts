@@ -56,7 +56,7 @@ export class RegistroEspecialista implements OnInit {
   }
 
   async ngOnInit() {
-    const { data, error } = await this.sb.rpc('get_captcha_enabled');
+    const { data, error } = await this.sb.rpc('get-captcha-enabled');
     this.captchaEnabled.set(data === true && !error);
     this.cargarEspecialidades();
     document.title = 'La Clínica Online - Registro de Especialista';

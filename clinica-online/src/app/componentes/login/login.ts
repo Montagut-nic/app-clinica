@@ -33,23 +33,23 @@ export class Login implements OnInit {
 
   quickUsers: QuickUser[] = [
     {
-      label: 'Paciente 1',
+      label: 'Jhon Doe',
       role: 'paciente',
-      email: 'lucamerolla124@gmail.com',
-      password: '123456',
+      email: 'piyijar697@cexch.com',
+      password: 'test123',
       avatar: '',
     },
     {
       label: 'Paciente 2',
       role: 'paciente',
-      email: 'pepeargento@yopmail.com',
+      email: 'nico.monta99@gmail.com',
       password: '123456',
       avatar: '',
     },
     {
       label: 'Paciente 3',
       role: 'paciente',
-      email: 'cockyargento@yopmail.com',
+      email: 'hewal39347@idwager.com',
       password: '123456',
       avatar: '',
     },
@@ -63,14 +63,14 @@ export class Login implements OnInit {
     {
       label: 'Especialista 2',
       role: 'especialista',
-      email: 'especialista@yopmail.com',
+      email: 'test@email.com',
       password: '123456',
       avatar: '',
     },
     {
       label: 'Admin',
       role: 'admin',
-      email: 'joaquin.messina@gmail.com',
+      email: 'montagut.nm@gmail.com',
       password: '123456',
       avatar: '',
     },

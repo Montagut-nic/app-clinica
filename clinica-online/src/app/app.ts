@@ -4,11 +4,12 @@ import { Loader } from './componentes/loader/loader';
 import { LoaderService } from './componentes/loader/loader-service';
 import { SessionService } from './servicios/session';
 import { CommonModule } from '@angular/common';
+import { ToastsComponent } from "./servicios/toast/toast";
 
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, RouterLink, Loader, CommonModule],
+  imports: [RouterOutlet, RouterLink, Loader, CommonModule, ToastsComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })

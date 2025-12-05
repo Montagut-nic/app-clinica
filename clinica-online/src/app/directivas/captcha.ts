@@ -35,16 +35,16 @@ export class CaptchaDirective {
 
     let codigo = '';
 
-    for (let i = 0; i < 6; i++) {
-      const a = this.alpha[Math.floor(Math.random() * this.alpha.length)];
-      const b = this.alpha[Math.floor(Math.random() * this.alpha.length)];
-      const c = this.alpha[Math.floor(Math.random() * this.alpha.length)];
-      const d = this.alpha[Math.floor(Math.random() * this.alpha.length)];
-      const e = this.alpha[Math.floor(Math.random() * this.alpha.length)];
-      const f = this.alpha[Math.floor(Math.random() * this.alpha.length)];
-      const g = this.alpha[Math.floor(Math.random() * this.alpha.length)];
-      codigo += a + ' '  + b + ' ' + c + ' '  + d + ' ' + e + ' ' + f + ' ' + g;
-    }
+
+    const a = this.alpha[Math.floor(Math.random() * this.alpha.length)];
+    const b = this.alpha[Math.floor(Math.random() * this.alpha.length)];
+    const c = this.alpha[Math.floor(Math.random() * this.alpha.length)];
+    const d = this.alpha[Math.floor(Math.random() * this.alpha.length)];
+    const e = this.alpha[Math.floor(Math.random() * this.alpha.length)];
+    const f = this.alpha[Math.floor(Math.random() * this.alpha.length)];
+    const g = this.alpha[Math.floor(Math.random() * this.alpha.length)];
+    codigo += a + ' ' + b + ' ' + c + ' ' + d + ' ' + e + ' ' + f + ' ' + g;
+
 
     const expected = codigo.replaceAll(' ', '');
 
@@ -56,11 +56,11 @@ export class CaptchaDirective {
       return;
     }
 
-    if ( answer === expected) {
+    if (answer === expected) {
       this.alreadyPassed = true;
       this.captchaPassed.emit();
     } else {
-      this.toast.error('Código incorrecto. Intentá nuevamente.');
+      alert('Código incorrecto. Intentá nuevamente.');
     }
   }
 
