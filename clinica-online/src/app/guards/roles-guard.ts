@@ -10,7 +10,7 @@ export const rolesGuard: CanActivateFn = async (route, state) => {
   await session.waitForProfile();
 
   const perfil = session.profile();
-  const user = session.user();
+  const user = session.user;
   if (!user || !perfil) {
     return router.createUrlTree(['/inicio']);
   }

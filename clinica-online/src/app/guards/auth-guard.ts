@@ -9,12 +9,11 @@ export const authGuard: CanActivateFn = async (route, state) => {
   const auth = inject(AuthService);
 
   await session.waitReady();
-  await session.waitForProfile();
+  
   const u = await auth.getCurrentUser();
+  const user = session.user;
 
-  const user = session.user();
-  const profile = session.profile();
-  if ( !u || u === null || !user || user === null || user === undefined || (profile !== null && profile!.categoria === 'especialista' && !profile!.activado)) {
+  if ( !u || u === null || !user || user === null || user === undefined ) {
     return router.createUrlTree(['/inicio']);
   }
   return true;

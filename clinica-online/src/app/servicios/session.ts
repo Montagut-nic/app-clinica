@@ -1,5 +1,5 @@
-import { computed, inject, Injectable, signal } from '@angular/core';
-import { User } from '@supabase/supabase-js';
+import { computed, inject, Injectable, NgZone, signal } from '@angular/core';
+import { Session, User } from '@supabase/supabase-js';
 import { SupabaseClientService } from './supabase-client';
 import { Usuario } from '../clases/usuario';
 import { Admin } from '../clases/admin';
@@ -7,6 +7,7 @@ import { Especialista } from '../clases/especialista';
 import { SpecialtyService } from './specialty';
 import { Paciente } from '../clases/paciente';
 import { AuthService } from './auth';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +16,7 @@ export class SessionService {
 
   private sb = inject(SupabaseClientService).client;
   private specialtySvc = inject(SpecialtyService);
-  private _user = signal<User | null>(null);
+  private _user$ = new BehaviorSubject<User | null>(null);
   private _profile = signal<Usuario | null>(null);
   private _loading = signal(false);
   private _ready = signal(false);
@@ -24,30 +25,37 @@ export class SessionService {
   private _initPromise: Promise<void> | null = null;
   private _whenProfileReadyResolvers: Array<() => void> = [];
 
-  readonly user = this._user.asReadonly();
   readonly profile = this._profile.asReadonly();
   readonly loading = this._loading.asReadonly();
   readonly ready = this._ready.asReadonly();
-  readonly isLoggedIn = computed(() => !!this._user());
+  readonly isLoggedIn = computed(() => !!this.user$);
+
+  private _ngZone = inject(NgZone);
 
   async hydrate(): Promise<void> {
     if (this._initPromise) return this._initPromise;
     this._initPromise = (async () => {
       // Leer sesión persistida 
       const { data: { session } } = await this.sb.auth.getSession();
-      this._user.set(session?.user ?? null);
+      this._user$.next(session?.user ?? null);
 
       // Cargar perfil
-      if (session?.user) {
+      if (this.user) {
         await this.loadProfile();
       } else {
         this._profile.set(null);
       }
 
       // Suscripción a cambios de auth
-      this.sb.auth.onAuthStateChange(async (_ev, s) => {
-        this._user.set(s?.user ?? null);
-        await this.loadProfile();
+      this.sb.auth.onAuthStateChange((_ev, s) => {
+        this._ngZone.run(() => {
+          this._user$.next(s?.user ?? null);
+          if (this.user) {
+            this.loadProfile();
+          } else {
+            this._profile.set(null);
+          }
+        });
       });
 
       this._ready.set(true);
@@ -57,6 +65,14 @@ export class SessionService {
 
   async waitReady(): Promise<void> {
     await this.hydrate();
+  }
+
+  get user$(): Observable<User | null> {
+    return this._user$.asObservable();
+  }
+
+  get user(): User | null {
+    return this._user$.value;
   }
 
   async waitForProfile(): Promise<void> {
@@ -71,16 +87,24 @@ export class SessionService {
   }
 
   async logout() {
-    await this.sb.auth.signOut();
-    this._user.set(null);
-    this._profile.set(null);
-    this._ready.set(true);
+    try {
+      const { error } = await this.sb.auth.signOut();
+      if (error) {
+        console.error('[session] logout error:', error);
+      }
+    } catch (e) {
+      console.error('[session] logout exception:', e);
+    } finally {
+      this._user$.next(null);
+      this._profile.set(null);
+      this._ready.set(true);
+    }
   }
 
-  private async loadProfile() {
+  async loadProfile() {
     this._loading.set(true);
     try {
-      const u = await this.auth.getCurrentUser();
+      const u = this.user;
       if (!u) {
         this._profile.set(null);
         return;
@@ -145,7 +169,7 @@ export class SessionService {
             Boolean(pr._is_approved)
           );
         } else if (pr._rol === 'paciente') {
-          us = new Paciente (pr._nombre, pr._apellido, Number(pr._edad), pr._dni, pr._obra_social, pr._email, pr._uuid, pr._avatar_path1, pr._avatar_path2);
+          us = new Paciente(pr._nombre, pr._apellido, Number(pr._edad), pr._dni, pr._obra_social, pr._email, pr._uuid, pr._avatar_path1, pr._avatar_path2);
         } else {
           console.warn(`Rol de usuario desconocido: ${pr._rol}`);
           this._profile.set(null);

@@ -8,7 +8,7 @@ export const registerGuard: CanActivateFn = async(route, state) => {
 
   await session.waitReady();
   await session.waitForProfile();
-  const user = session.user();
+  const user = session.user;
   const profile = session.profile();
 
   if (!user || profile?.categoria === 'admin') {

@@ -162,7 +162,6 @@ export class Login implements OnInit {
         return;
       }
 
-
       await this.session.refresh();
 
       const prof = this.session.profile();
@@ -172,7 +171,7 @@ export class Login implements OnInit {
         return;
       }
 
-      if (prof.categoria === 'admin') this.router.navigateByUrl('/admin/usuarios', { replaceUrl: true });
+      if (prof.categoria === 'admin') this.router.navigateByUrl('/usuarios', { replaceUrl: true });
       else this.router.navigateByUrl('/mi-perfil', { replaceUrl: true });
     } finally {
       this.loader.hide();
