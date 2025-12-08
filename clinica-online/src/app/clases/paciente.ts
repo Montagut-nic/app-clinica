@@ -1,13 +1,9 @@
 import { Usuario } from "./usuario";
 
 export class Paciente extends Usuario {
-    
-    override save(): void {
-        throw new Error("Method not implemented.");
-    }
 
-    private imagenSecundariaUrl: string;
-    private obraSocial: string;
+    imagenSecundariaUrl: string;
+    obraSocial: string;
 
     constructor(
         nombre: string,

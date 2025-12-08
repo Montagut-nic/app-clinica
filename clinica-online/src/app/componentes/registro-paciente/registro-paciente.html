@@ -1,183 +1,195 @@
-<div class="card shadow-sm">
-    <div class="card-header bg-light d-flex align-items-center gap-2">
-        <i class="bi bi-person-plus"></i>
-        <h5 class="mb-0">
-            Registro Paciente
-        </h5>
-    </div>
+<div class="container py-4">
+    @if (this.isAdmin()) {
+    <a routerLink="/usuarios" class="volver-button" aria-label="Volver a la página de administrar usuarios">
+        Volver a Administrar Usuarios
+    </a>
+    } @else {
+    <a routerLink="/inicio" class="volver-button" aria-label="Volver a la página de inicio">
+        Volver al inicio
+    </a>
+    }
 
-    <div class="card-body">
+    <div class="card shadow-sm">
+        <div class="card-header bg-light d-flex align-items-center gap-2">
+            <i class="bi bi-person-plus"></i>
+            <h5 class="mb-0">
+                Registro Paciente
+            </h5>
+        </div>
 
-        <form #f="ngForm" novalidate>
-            <!-- Datos personales -->
-            <div class="row g-3">
-                <div class="col-md-6">
-                    <label class="form-label">
-                        Nombre
-                    </label>
-                    <input class="form-control" name="nombre" [(ngModel)]="nombre" required #nombreNg="ngModel"
-                        [class.is-invalid]="
-                    nombreNg.invalid && (nombreNg.touched || f.submitted)
-                  " />
-                    <div class="invalid-feedback">
-                        Nombre es requerido.
-                    </div>
-                </div>
+        <div class="card-body">
 
-                <div class="col-md-6">
-                    <label class="form-label">
-                        Apellido
-                    </label>
-                    <input class="form-control" name="apellido" [(ngModel)]="apellido" required #apellidoNg="ngModel"
-                        [class.is-invalid]="
-                    apellidoNg.invalid && (apellidoNg.touched || f.submitted)
-                  " />
-                    <div class="invalid-feedback">
-                        Apellido es requerido.
-                    </div>
-                </div>
-
-                <div class="col-md-4">
-                    <label class="form-label">
-                        Edad
-                    </label>
-                    <input type="number" class="form-control" name="edad" [(ngModel)]="edad" min="1" required
-                        #edadNg="ngModel" [class.is-invalid]="
-                    edadNg.invalid && (edadNg.touched || f.submitted)
-                  " />
-                    <div class="invalid-feedback">
-                        <ng-container *ngIf="edadNg.errors?.['required']">
-                            Edad es requerida.
-                        </ng-container>
-                        <ng-container *ngIf="edadNg.errors?.['min']">
-                            Edad debe ser mayor a 0.
-                        </ng-container>
-                    </div>
-                </div>
-
-                <div class="col-md-4">
-                    <label class="form-label">
-                        DNI
-                    </label>
-                    <input class="form-control" name="dni" [(ngModel)]="dni" required #dniNg="ngModel"
-                        [class.is-invalid]="
-                    dniNg.invalid && (dniNg.touched || f.submitted)
-                  " />
-                    <div class="invalid-feedback">
-                        DNI es requerido.
-                    </div>
-                </div>
-
-                <div class="col-md-4">
-                    <label class="form-label">
-                        Obra Social
-                    </label>
-                    <input class="form-control" name="obra" [(ngModel)]="obra_social" required #obraNg="ngModel"
-                        [class.is-invalid]="
-                    obraNg.invalid && (obraNg.touched || f.submitted)
-                  " />
-                    <div class="invalid-feedback">
-                        Obra Social es requerida.
-                    </div>
-                </div>
-            </div>
-
-            <hr class="my-4" />
-
-            <!-- Credenciales -->
-            <div class="row g-3">
-                <div class="col-md-6">
-                    <label class="form-label">
-                        Correo Electrónico
-                    </label>
-                    <input type="email" class="form-control" name="email" [(ngModel)]="email" required email
-                        #emailNg="ngModel" [class.is-invalid]="
-                    emailNg.invalid && (emailNg.touched || f.submitted)
-                  " />
-                    <div class="invalid-feedback">
-                        <ng-container *ngIf="emailNg.errors?.['required']">
-                            Correo electrónico es requerido.
-                        </ng-container>
-                        <ng-container *ngIf="emailNg.errors?.['email']">
-                            Ingresa un correo electrónico válido.
-                        </ng-container>
-                    </div>
-                </div>
-
-                <div class="col-md-6">
-                    <label class="form-label">
-                        Contraseña
-                    </label>
-                    <div class="input-group">
-                        <input [type]="'password'" class="form-control" name="password" [(ngModel)]="password" required
-                            minlength="6" #pwdNg="ngModel" [class.is-invalid]="
-                      pwdNg.invalid && (pwdNg.touched || f.submitted)
-                    " />
-                        <span class="input-group-text">
-                            <i class="bi bi-shield-lock"></i>
-                        </span>
-                        <div class="invalid-feedback">
-                            <ng-container *ngIf="pwdNg.errors?.['required']">
-                                Contraseña es requerida.
-                            </ng-container>
-                            <ng-container *ngIf="pwdNg.errors?.['minlength']">
-                                La contraseña debe tener al menos 6 caracteres.
-                            </ng-container>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Imágenes paciente -->
-            <div class="mt-4">
-                <label class="form-label fw-semibold">
-                    Imágenes de perfil (obligatorio)
-                </label>
+            <form #f="ngForm" novalidate>
+                <!-- Datos personales -->
                 <div class="row g-3">
                     <div class="col-md-6">
-                        <input type="file" class="form-control" #fileP1 (change)="onFileChange('p1', $event)"
-                            accept="image/*" [class.is-invalid]="f.submitted && !fileP1.value" />
-                        <div class="form-text">
-                            Principal
-                        </div>
+                        <label class="form-label">
+                            Nombre
+                        </label>
+                        <input class="form-control" name="nombre" [(ngModel)]="nombre" required #nombreNg="ngModel"
+                            [class.is-invalid]="
+                    nombreNg.invalid && (nombreNg.touched || f.submitted)
+                  " />
                         <div class="invalid-feedback">
-                            Imagen de perfil principal es requerida.
+                            Nombre es requerido.
                         </div>
                     </div>
+
                     <div class="col-md-6">
-                        <input type="file" class="form-control" #fileP2 (change)="onFileChange('p2', $event)"
-                            accept="image/*" [class.is-invalid]="f.submitted && !fileP2.value" />
-                        <div class="form-text">
-                            Secundaria
-                        </div>
+                        <label class="form-label">
+                            Apellido
+                        </label>
+                        <input class="form-control" name="apellido" [(ngModel)]="apellido" required
+                            #apellidoNg="ngModel" [class.is-invalid]="
+                    apellidoNg.invalid && (apellidoNg.touched || f.submitted)
+                  " />
                         <div class="invalid-feedback">
-                            Imagen de perfil secundaria es requerida.
+                            Apellido es requerido.
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">
+                            Edad
+                        </label>
+                        <input type="number" class="form-control" name="edad" [(ngModel)]="edad" min="1" required
+                            #edadNg="ngModel" [class.is-invalid]="
+                    edadNg.invalid && (edadNg.touched || f.submitted)
+                  " />
+                        <div class="invalid-feedback">
+                            <ng-container *ngIf="edadNg.errors?.['required']">
+                                Edad es requerida.
+                            </ng-container>
+                            <ng-container *ngIf="edadNg.errors?.['min']">
+                                Edad debe ser mayor a 0.
+                            </ng-container>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">
+                            DNI
+                        </label>
+                        <input class="form-control" name="dni" [(ngModel)]="dni" required #dniNg="ngModel"
+                            [class.is-invalid]="
+                    dniNg.invalid && (dniNg.touched || f.submitted)
+                  " />
+                        <div class="invalid-feedback">
+                            DNI es requerido.
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">
+                            Obra Social
+                        </label>
+                        <input class="form-control" name="obra" [(ngModel)]="obra_social" required #obraNg="ngModel"
+                            [class.is-invalid]="
+                    obraNg.invalid && (obraNg.touched || f.submitted)
+                  " />
+                        <div class="invalid-feedback">
+                            Obra Social es requerida.
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <hr class="my-4" />
+                <hr class="my-4" />
 
-            <div class="mb-3" *ngIf="captchaEnabled">
-                <label class="form-label">
-                    Captcha
-                </label>
-                <app-recaptcha [siteKey]="siteKey" (resolved)="onCaptchaResolved($event)"></app-recaptcha>
-                <div class="form-text">
-                    Marcá la casilla "No soy un robot".
+                <!-- Credenciales -->
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">
+                            Correo Electrónico
+                        </label>
+                        <input type="email" class="form-control" name="email" [(ngModel)]="email" required email
+                            #emailNg="ngModel" [class.is-invalid]="
+                    emailNg.invalid && (emailNg.touched || f.submitted)
+                  " />
+                        <div class="invalid-feedback">
+                            <ng-container *ngIf="emailNg.errors?.['required']">
+                                Correo electrónico es requerido.
+                            </ng-container>
+                            <ng-container *ngIf="emailNg.errors?.['email']">
+                                Ingresa un correo electrónico válido.
+                            </ng-container>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">
+                            Contraseña
+                        </label>
+                        <div class="input-group">
+                            <input [type]="'password'" class="form-control" name="password" [(ngModel)]="password"
+                                required minlength="6" #pwdNg="ngModel" [class.is-invalid]="
+                      pwdNg.invalid && (pwdNg.touched || f.submitted)
+                    " />
+                            <span class="input-group-text">
+                                <i class="bi bi-shield-lock"></i>
+                            </span>
+                            <div class="invalid-feedback">
+                                <ng-container *ngIf="pwdNg.errors?.['required']">
+                                    Contraseña es requerida.
+                                </ng-container>
+                                <ng-container *ngIf="pwdNg.errors?.['minlength']">
+                                    La contraseña debe tener al menos 6 caracteres.
+                                </ng-container>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Submit -->
-            <div class="d-grid mt-4">
-                <button type="button" class="btn btn-primary btn-lg" [appCaptcha]="captchaEnabled()" [persist]="false"
-                    (captchaPassed)="submit()">
-                    <span class="spinner-border spinner-border-sm me-2" *ngIf="loading"></span>
-                    Crear cuenta
-                </button>
-            </div>
+                <!-- Imágenes paciente -->
+                <div class="mt-4">
+                    <label class="form-label fw-semibold">
+                        Imágenes de perfil (obligatorio)
+                    </label>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <input type="file" class="form-control" #fileP1 (change)="onFileChange('p1', $event)"
+                                accept="image/*" [class.is-invalid]="f.submitted && !fileP1.value" />
+                            <div class="form-text">
+                                Principal
+                            </div>
+                            <div class="invalid-feedback">
+                                Imagen de perfil principal es requerida.
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <input type="file" class="form-control" #fileP2 (change)="onFileChange('p2', $event)"
+                                accept="image/*" [class.is-invalid]="f.submitted && !fileP2.value" />
+                            <div class="form-text">
+                                Secundaria
+                            </div>
+                            <div class="invalid-feedback">
+                                Imagen de perfil secundaria es requerida.
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-        </form>
+                <hr class="my-4" />
+
+                <div class="mb-3" *ngIf="captchaEnabled">
+                    <label class="form-label">
+                        Captcha
+                    </label>
+                    <app-recaptcha [siteKey]="siteKey" (resolved)="onCaptchaResolved($event)"></app-recaptcha>
+                    <div class="form-text">
+                        Marcá la casilla "No soy un robot".
+                    </div>
+                </div>
+
+                <!-- Submit -->
+                <div class="d-grid mt-4">
+                    <button type="button" class="btn btn-primary btn-lg" [appCaptcha]="captchaEnabled()"
+                        [persist]="false" (captchaPassed)="submit()">
+                        <span class="spinner-border spinner-border-sm me-2" *ngIf="loading"></span>
+                        Crear cuenta
+                    </button>
+                </div>
+
+            </form>
+        </div>
     </div>
 </div>

@@ -1,5 +1,4 @@
-import { Directive, EventEmitter, HostListener, inject, Input, Output } from '@angular/core';
-import { ToastService } from '../servicios/toast';
+import { Directive, EventEmitter, HostListener, Input, Output } from '@angular/core';
 
 @Directive({
   selector: '[appCaptcha]'
@@ -11,7 +10,6 @@ export class CaptchaDirective {
 
   @Output() captchaPassed = new EventEmitter<void>();
 
-  private toast = inject(ToastService);
   private alreadyPassed = false;
 
   private alpha = Array('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
@@ -21,6 +19,7 @@ export class CaptchaDirective {
   @HostListener('click', ['$event'])
   onClick(ev: Event) {
     if (!this.enabled) {
+      this.alreadyPassed = true;
       this.captchaPassed.emit();
       return;
     }

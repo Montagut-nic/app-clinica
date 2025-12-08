@@ -5,7 +5,7 @@ import { SupabaseClientService } from './supabase-client';
   providedIn: 'root'
 })
 export class SpecialtyService {
-private sb = inject(SupabaseClientService).client;
+  private sb = inject(SupabaseClientService).client;
 
   async listActive() {
     return await this.sb
@@ -14,6 +14,16 @@ private sb = inject(SupabaseClientService).client;
       .eq('is_custom', false)
       .eq('is_active', true)
       .order('nombre', { ascending: true });
+  }
+
+  async listSpecialties() {
+    const { data, error } = await this.sb
+      .from('specialties')
+      .select('id, nombre')
+      .eq('is_active', true)
+      .order('nombre', { ascending: true });
+    if (error) throw error;
+    return data as { id: string; nombre: string }[];
   }
 
   async add(nombre: string) {
@@ -34,29 +44,29 @@ private sb = inject(SupabaseClientService).client;
     return { data, error };
   }
 
-  async ensure(nombre: string): Promise<string> {
-    const n = nombre.trim();
-    if (!n) throw new Error('Nombre de especialidad vacío');
+  async update(id: string, active = true, custom = true, nombre: string | null = null) {
+    if (nombre === null || nombre.trim() === '') {
+      const { data, error } = await this.sb
+        .from('specialties')
+        .update({ is_active: active, is_custom: custom })
+        .eq('id', id)
+        .select('id,nombre')
+        .single();
+      return { data, error };
+    } else {
+      const { data, error } = await this.sb
+        .from('specialties')
+        .update({ nombre: nombre.trim(), is_active: active, is_custom: custom })
+        .eq('id', id)
+        .select('id,nombre')
+        .single();
+      return { data, error };
+    }
 
-    const { data: found, error: findErr } = await this.sb
-      .from('specialties')
-      .select('id')
-      .eq('nombre', n)
-      .maybeSingle();
-
-    if (!findErr && found?.id) return found.id as string;
-
-    const { data, error } = await this.sb
-      .from('specialties')
-      .insert({ nombre: n, is_active: true })
-      .select('id')
-      .single();
-
-    if (error) throw error;
-    return data!.id as string;
   }
 
-  async getById(id: string) : Promise<{ data: {id: string, nombre:  string} | null; error: any}> {
+
+  async getById(id: string): Promise<{ data: { id: string, nombre: string } | null; error: any }> {
     const { data, error } = await this.sb
       .from('specialties')
       .select('id,nombre')
@@ -65,7 +75,7 @@ private sb = inject(SupabaseClientService).client;
     return { data, error };
   }
 
-  async getByName(nombre: string) : Promise<{ data: {id: string, nombre:  string} | null; error: any}> {
+  async getByName(nombre: string): Promise<{ data: { id: string, nombre: string } | null; error: any }> {
     const { data, error } = await this.sb
       .from('specialties')
       .select('id,nombre')

@@ -14,18 +14,26 @@
   text-transform: uppercase;
 }
 
+.row {
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: flex-start;
+}
+
 /* Lista de accesos rápidos */
 .qa-list {
   display: flex;
   flex-wrap: wrap;
+  flex-direction: row;
   gap: 12px;
   justify-content: center;
 }
 
 /* Botón de acceso rápido (requerido rectangular 16:9) */
 .qa-btn {
-  width: 168px; /* rectangular */
-  aspect-ratio: 16 / 9;
+  height: 168px; /* rectangular */
+  aspect-ratio: 9 / 16;
   border: 1px solid var(--bs-border-color);
   border-radius: 0.5rem;
   background: #f9fafb;
@@ -46,20 +54,16 @@
 }
 
 .qa-btn img {
-  width: 48px;
-  height: 48px;
-  object-fit: cover;
+  height: 100%;
   border-radius: 0.5rem;
+  max-width: 100px;
+  aspect-ratio: 1/1;
 }
 
-.qa-text {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.1;
-}
-
-.qa-label {
-  font-weight: 600;
+.login-icon {
+  max-width: 10%;
+  object-fit: contain;
+  filter: drop-shadow(0 0 6px rgba(14, 47, 138, 0.35));
 }
 
 /* Card de login */

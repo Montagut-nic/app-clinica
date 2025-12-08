@@ -1,7 +1,7 @@
 import { Component, HostListener, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { ToastService } from '../../servicios/toast';
 import { LoaderService } from '../loader/loader-service';
 import { SupabaseClientService } from '../../servicios/supabase-client';
@@ -14,7 +14,7 @@ import { CaptchaDirective } from '../../directivas/captcha';
 @Component({
   selector: 'app-registro-especialista',
   imports: [CommonModule,
-    FormsModule, Recaptcha, CaptchaDirective],
+    FormsModule, Recaptcha, CaptchaDirective, RouterLink],
   templateUrl: './registro-especialista.html',
   styleUrl: './registro-especialista.scss',
 })
@@ -34,9 +34,11 @@ export class RegistroEspecialista implements OnInit {
   private loader = inject(LoaderService);
   private router = inject(Router);
   private sb = inject(SupabaseClientService).client;
-  private auth = inject(AuthService);
+  private authSvc = inject(AuthService);
   private specialtySvc = inject(SpecialtyService);
   private toast = inject(ToastService);
+
+  isAdmin = signal(false);
 
   nombre = '';
   apellido = '';
@@ -60,6 +62,11 @@ export class RegistroEspecialista implements OnInit {
     this.captchaEnabled.set(data === true && !error);
     this.cargarEspecialidades();
     document.title = 'La Clínica Online - Registro de Especialista';
+    if (await this.authSvc.isAdmin()) {
+      this.captchaEnabled.set(false);
+      this.isAdmin.set(true);
+    }
+
   }
 
   async cargarEspecialidades() {
@@ -149,7 +156,7 @@ export class RegistroEspecialista implements OnInit {
     if (!this.nombre.trim()) return 'El nombre es obligatorio.';
     if (!this.apellido.trim()) return 'El apellido es obligatorio.';
     if (!this.edad || this.edad <= 0) return 'La edad no es válida.';
-    if (!/^\d{6,}$/.test(this.dni)) return 'El DNI no es válido.';
+    if (!/^\d{6,9}$/.test(this.dni)) return 'El DNI no es válido.';
     if (!/^\S+@\S+\.\S+$/.test(this.email)) return 'El correo electrónico no es válido.';
     if ((this.password ?? '').length < 6) return 'La contraseña debe tener al menos 6 caracteres.';
     if (this.selectedSpecialtyIds.length === 0) return 'Elegí al menos una especialidad';
@@ -186,10 +193,9 @@ export class RegistroEspecialista implements OnInit {
       }
     }
 
-    // ---- Especialidades seleccionadas / otras ----
+    // ---- Especialidades existentes seleccionadas + otras ----
     let selectedExistingIds: string[] = [];
     let specialtyOther: string | null = null;
-
 
     selectedExistingIds = this.specialties().filter(s => !s.isCustom && this.selectedSpecialtyIds.includes(s.id)).map(s => s.id);
 
@@ -199,139 +205,140 @@ export class RegistroEspecialista implements OnInit {
 
     specialtyOther = customNames.length > 0 ? customNames.join(', ') : null;
 
-
-    // ---- Resto de la lógica igual que tenías ----
     this.loader.show();
     try {
-      await (async () => {
-        const bucket = this.sb.storage.from('avatars');
-        const folder = `avatars/${this.dni.trim()}/${crypto.randomUUID?.() ?? Math.random().toString(36).slice(2)
-          }`;
+      const bucket = this.sb.storage.from('avatars');
+      const folder = `${this.dni.trim()}-${Date.now()}`;
 
-        const { data: dniTaken, error: dniChkErr } = await this.sb.rpc(
-          'dni_exists',
-          {
-            _dni: this.dni.trim(),
-          }
-        );
-        if (dniChkErr) {
-          console.warn('[register] dni_exists error:', dniChkErr);
-          this.toast.error('No se pudo validar el DNI. Intentalo nuevamente.');
-          return;
+      const { data: dniTaken, error: dniChkErr } = await this.sb.rpc(
+        'dni_exists',
+        {
+          _doc: this.dni.trim(),
         }
-        if (dniTaken) {
-          this.toast.error('Ya existe un usuario con ese DNI.');
-          return;
+      );
+      if (dniChkErr) {
+        console.warn('[register] dni_exists error:', dniChkErr);
+        this.toast.error('No se pudo validar el DNI. Intentalo nuevamente.');
+        return;
+      }
+      if (dniTaken) {
+        console.warn('[register] dni_exists:', dniTaken);
+        this.toast.error('Ya existe un usuario con ese DNI.');
+        return;
+      }
+
+      const { data: email_taken, error: emailChkErr } = await this.sb.rpc(
+        'email_exists',
+        {
+          _correo: this.email.trim().toLowerCase(),
         }
+      );
+      if (emailChkErr) {
+        console.warn('[register] email_exists error:', emailChkErr);
+        this.toast.error('No se pudo validar el correo electrónico. Intentalo nuevamente.');
+        return;
+      }
+      if (email_taken) {
+        this.toast.error('Ya existe un usuario con ese correo electrónico.');
+        return;
+      }
 
-        const { data: email_taken, error: emailChkErr } = await this.sb.rpc(
-          'email_exists',
-          {
-            _email: this.email.trim().toLowerCase(),
-          }
-        );
-        if (emailChkErr) {
-          console.warn('[register] email_exists error:', emailChkErr);
-          this.toast.error('No se pudo validar el correo electrónico. Intentalo nuevamente.');
-          return;
-        }
-        if (email_taken) {
-          this.toast.error('Ya existe un usuario con ese correo electrónico.');
-          return;
-        }
+      const upload = async (file: File | undefined, name: string) => {
+        if (!file) return null;
+        const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+        const path = `${folder}/${name}-${Date.now()}.${ext}`;
+        const { error: upErr } = await bucket.upload(path, file, {
+          upsert: true,
+        });
+        if (upErr) throw upErr;
+        return path;
+      };
 
-        const upload = async (file: File | undefined, name: string) => {
-          if (!file) return null;
-          const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
-          const path = `${folder}/${name}-${Date.now()}.${ext}`;
-          const { error: upErr } = await bucket.upload(path, file, {
-            upsert: true,
-          });
-          if (upErr) throw upErr;
-          return path;
-        };
+      let avatarPath1: string | null = null;
+      try {
+        avatarPath1 = await upload(this.fotoEsp, 'especialista');
+      } catch (e: any) {
+        console.warn('[register] upload pending error:', e?.message || e);
+      }
 
-        let avatarPath1: string | null = null;
-        try {
-          avatarPath1 = await upload(this.fotoEsp, 'especialista');
-        } catch (e: any) {
-          console.warn('[register] upload pending error:', e?.message || e);
-        }
-
-        
-        let newUser;
-
-        const { data: resp, error: signErr } = await this.sb.auth.signUp({
-          email: this.email.trim().toLowerCase(),
-          password: this.password,
-          options: {
-            data: {
-              rol: 'especialista',
-              nombre: this.nombre.trim(),
-              apellido: this.apellido.trim(),
-              edad: this.edad,
-              dni: this.dni.trim(),
-              obra_social: null,
-              avatar_path1: avatarPath1,
-              avatar_path2: null,
-              specialties_ids: selectedExistingIds,
-              specialty_other: specialtyOther,
-            },
+      const { data: resp, error: signErr } = await this.sb.auth.signUp({
+        email: this.email.trim().toLowerCase(),
+        password: this.password,
+        options: {
+          data: {
+            rol: 'especialista',
+            nombre: this.nombre.trim(),
+            apellido: this.apellido.trim(),
+            edad: this.edad,
+            dni: this.dni.trim(),
+            obra_social: null,
+            avatar_path1: avatarPath1,
+            avatar_path2: null,
+            specialties_ids: selectedExistingIds,
+            specialty_other: specialtyOther,
           },
-        });
+        },
+      });
 
-        if (signErr) {
-          this.toast.error(signErr.message);
-          return;
-        } else {
-          newUser = resp.session!.user;
-        }
+      if (signErr) {
+        this.toast.error(signErr.message);
+        return;
+      }
 
-        const specialtiesIds = selectedExistingIds.join(', ');
-        const { error: ppErr } = await this.sb.rpc('insert_pending_profile', {
-          _uuid: newUser.id,
-          _email: this.email.trim().toLowerCase(),
-          _nombre: this.nombre.trim(),
-          _apellido: this.apellido.trim(),
-          _edad: this.edad!,
-          _dni: this.dni.trim(),
-          _specialty_id: specialtiesIds,
-          _specialty_other: specialtyOther,
-          _avatar_path1: avatarPath1,
-        });
+      const newUser = resp.user;
 
-        if (ppErr) {
-          console.warn('[register] rpc insert_pending_profile error:', ppErr);
-          this.toast.error('No se pudo preparar el registro.');
-          return;
-        }
+      if (!newUser) {
+        // no hubo error pero tampoco user, caso raro
+        this.toast.error('No se pudo crear el usuario.');
+        return;
+      }
+      
+      const specialtiesIds = selectedExistingIds.join(', ');
+      const { error: ppErr } = await this.sb.rpc('insert_pending_profile', {
+        _email: this.email.trim().toLowerCase(),
+        _nombre: this.nombre.trim(),
+        _apellido: this.apellido.trim(),
+        _edad: this.edad!,
+        _dni: this.dni.trim(),
+        _specialty_id: specialtiesIds,
+        _specialty_other: specialtyOther,
+        _avatar_path1: avatarPath1,
+        _uuid: newUser.id
+      });
 
-        this.specialties().forEach(async (s) => {
-          if (this.selectedSpecialtyIds.includes(s.id)) {
-            if (s.isCustom) {
-              const { data } = await this.specialtySvc.addCustom(s.nombre);
-              if (data) {
-                await this.sb.from('profile_specialty').insert({
-                  profile_id: newUser.id,
-                  specialty_id: data.id
-                }
-                )
-              }
-            } else {
+      if (ppErr) {
+        console.warn('[register] rpc insert_pending_profile error:', ppErr);
+        this.toast.error('No se pudo preparar el registro.');
+        return;
+      }
+
+      this.specialties().forEach(async (s) => {
+        if (this.selectedSpecialtyIds.includes(s.id)) {
+          if (s.isCustom) {
+            const { data } = await this.specialtySvc.addCustom(s.nombre);
+            if (data) {
               await this.sb.from('profile_specialty').insert({
                 profile_id: newUser.id,
-                specialty_id: s.id
-              });
+                specialty_id: data.id
+              }
+              )
             }
+          } else {
+            await this.sb.from('profile_specialty').insert({
+              profile_id: newUser.id,
+              specialty_id: s.id
+            });
           }
-        });
-
-
-
-        this.toast.success('Un correo fue enviado para confirmar la cuenta. Confirmá tu cuenta y luego iniciá sesión para completar el perfil.');
-        this.router.navigateByUrl('/login');
-
+        }
       });
+
+      if (this.isAdmin()) {
+        this.toast.success('Especialista registrado exitosamente. Un correo fue enviado para confirmar la cuenta.');
+        this.router.navigateByUrl('/usuarios');
+      }else {
+      this.toast.success('Un correo fue enviado para confirmar la cuenta. Confirmá tu cuenta y luego iniciá sesión para completar el perfil.');
+      this.router.navigateByUrl('/acceso');
+      }
 
     } finally {
       this.loader.hide();

@@ -1,0 +1,196 @@
+.admin-users-page {
+  padding-top: 0;
+}
+
+.page-title-bar h1 {
+    font-weight: 600;
+}
+
+.users-table-card {
+  border-radius: 0.8rem;
+}
+
+.modal-content {
+  border: 5px solid rgba(0, 0, 0, .17);
+}
+
+td span.text-bg-light {
+  background-color: #c4ced8 !important;
+}
+
+/* Tabla */
+.users-table thead th {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #000000;
+  background-color: #d5e3f4;
+  border-bottom-color: #e5e7eb;
+}
+
+.users-table tbody tr.user-row {
+  position: relative;
+  transition: background-color 0.15s ease-out, box-shadow 0.15s ease-out;
+}
+
+.users-table tbody tr.user-row:hover {
+  background-color: #8ba4c4;
+}
+
+/* Sticky header */
+.table-sticky thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+/* Compact spacing on desktop, comfy on mobile */
+:host ::ng-deep .table td,
+:host ::ng-deep .table th {
+  vertical-align: middle;
+}
+
+.admin-avatar {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 1px solid #e5e7eb;
+  display: inline-block;
+  transform-origin: center;
+  box-shadow: 0 0 0 2px #fff;
+
+  position: relative; 
+  z-index: 5; 
+}
+
+.role-badge {
+  border-radius: 999px;
+  font-size: 0.75rem;
+  padding-inline: 0.75rem;
+  padding-block: 0.25rem;
+  text-transform: capitalize;
+}
+
+.role-admin {
+  background-color: #111827;
+  color: #f9fafb;
+}
+
+.role-especialista {
+  background-color: #2563eb;
+  color: #eff6ff;
+}
+
+.role-paciente {
+  background-color: #6b7280;
+  color: #f9fafb;
+}
+
+/* Badges de estado */
+.status-badge {
+  border-radius: 999px;
+  font-size: 0.75rem;
+  padding-inline: 0.75rem;
+  padding-block: 0.25rem;
+}
+
+.status-ok {
+  background-color: #16a34a;
+  color: #ecfdf3;
+}
+
+.status-pending {
+  background-color: #facc15;
+  color: #78350f;
+}
+
+/* Pill de especialidad */
+.speciality-pill {
+  font-weight: 500;
+  font-size: 0.8rem;
+}
+
+/* Mobile tweaks */
+@media (max-width: 768px) {
+  .page-title-bar {
+    text-align: left;
+  }
+
+  .users-table thead {
+    font-size: 0.7rem;
+  }
+
+  .users-table td {
+    font-size: 0.85rem;
+  }
+}
+
+/* ---------- Card de exportación rápida por usuario ---------- */
+.quick-export-card {
+  border-radius: 0.8rem;
+}
+
+.quick-pill-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(34, 197, 94, 0.12);
+  color: #16a34a;
+  font-size: 1rem;
+}
+
+.fav-user {
+  align-items: center;
+  cursor: pointer;
+  padding: 0;
+}
+
+.fav-user:hover img {
+  transform: translateY(-2px) scale(1.03);
+  border-color: #0d6efd;
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3);
+}
+
+.page-header-pill {
+  display: inline-block;
+  padding: 0.5rem 0.9rem;
+  border-radius: 0.85rem;
+  background-color: #ffffffdd; 
+  backdrop-filter: blur(4px);
+}
+
+.card-deck {
+  display: inline-flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  img {
+    max-width: 48px;
+    margin-top: 15px;
+  }
+}
+
+.admin-actions {
+  .btn-outline-primary,
+  .btn-outline-secondary {
+    background-color: #ffffffee; // blanco casi sólido
+    border-color: #cbd5e1; // gris clarito
+  }
+
+  .btn-outline-primary {
+    color: #0d6efd; // azul bootstrap
+  }
+
+  .btn-outline-secondary {
+    color: #4b5563; // gris oscuro
+  }
+
+  .btn-outline-primary:hover,
+  .btn-outline-secondary:hover {
+    background-color: #e5edff; // leve highlight al hover
+    border-color: #94a3b8;
+  }
+}

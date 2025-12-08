@@ -16,7 +16,7 @@ declare const grecaptcha: any;
 
 @Component({
   selector: 'app-recaptcha',
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './recaptcha.html',
   styleUrl: './recaptcha.scss',
 })

@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, signal, } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { Recaptcha } from '../recaptcha/recaptcha';
 import { recaptchaSiteKey } from '../../../environments/environment';
 import { CaptchaDirective } from '../../directivas/captcha';
@@ -9,11 +9,12 @@ import { ToastService } from '../../servicios/toast';
 import { AuthService } from '../../servicios/auth';
 import { SupabaseClientService } from '../../servicios/supabase-client';
 import { LoaderService } from '../loader/loader-service';
+import { User } from '@supabase/supabase-js';
 
 
 @Component({
   selector: 'app-registro-paciente',
-  imports: [FormsModule, CommonModule, Recaptcha, CaptchaDirective],
+  imports: [FormsModule, CommonModule, Recaptcha, CaptchaDirective, RouterLink],
   templateUrl: './registro-paciente.html',
   styleUrl: './registro-paciente.scss',
 })
@@ -26,8 +27,9 @@ export class RegistroPaciente implements OnInit {
   private loader = inject(LoaderService);
   private router = inject(Router);
   private sb = inject(SupabaseClientService).client;
-  private auth = inject(AuthService);
+  private authSvc = inject(AuthService);
   private toast = inject(ToastService);
+  isAdmin = signal(false);
 
   nombre = '';
   apellido = '';
@@ -46,6 +48,10 @@ export class RegistroPaciente implements OnInit {
     const { data, error } = await this.sb.rpc('get-captcha-enabled');
     this.captchaEnabled.set(data === true && !error);
     document.title = 'La Clínica Online - Registro de Paciente';
+    if (await this.authSvc.isAdmin()) {
+      this.captchaEnabled.set(false);
+      this.isAdmin.set(true);
+    }
   }
 
   onCaptchaResolved(token: string | null) {
@@ -104,12 +110,12 @@ export class RegistroPaciente implements OnInit {
     this.loader.show();
     try {
       const bucket = this.sb.storage.from('avatars');
-      const folder = `avatars/${this.dni.trim()}/${crypto.randomUUID?.() ?? Math.random().toString(36).slice(2)}`;
+      const folder = `${this.dni.trim()}-${Date.now()}`;
 
       const { data: dniTaken, error: dniChkErr } = await this.sb.rpc(
         'dni_exists',
         {
-          _dni: this.dni.trim(),
+          _doc: this.dni.trim(),
         }
       );
       if (dniChkErr) {
@@ -118,6 +124,7 @@ export class RegistroPaciente implements OnInit {
         return;
       }
       if (dniTaken) {
+        console.warn('[register] dni_exists:', dniTaken);
         this.toast.error('Ya existe un usuario con ese DNI.');
         return;
       }
@@ -125,7 +132,7 @@ export class RegistroPaciente implements OnInit {
       const { data: email_taken, error: emailChkErr } = await this.sb.rpc(
         'email_exists',
         {
-          _email: this.email.trim().toLowerCase(),
+          _correo: this.email.trim().toLowerCase(),
         }
       );
       if (emailChkErr) {
@@ -159,25 +166,7 @@ export class RegistroPaciente implements OnInit {
         console.warn('[register] upload pending error:', e?.message || e);
       }
 
-      const { error: ppErr } = await this.sb.rpc('insert_patient_profile', {
-        _email: this.email.trim().toLowerCase(),
-        _rol: 'paciente',
-        _nombre: this.nombre.trim(),
-        _apellido: this.apellido.trim(),
-        _edad: this.edad!,
-        _dni: this.dni.trim(),
-        _obra_social: this.obra_social.trim(),
-        _avatar_path1: avatarPath1,
-        _avatar_path2: avatarPath2,
-      });
-
-      if (ppErr) {
-        console.warn('[register] rpc insert_patient_profile error:', ppErr);
-        this.toast.error('No se pudo preparar el registro.');
-        return;
-      }
-
-      const { error: signErr } = await this.sb.auth.signUp({
+      const { data: resp, error: signErr } = await this.sb.auth.signUp({
         email: this.email.trim().toLowerCase(),
         password: this.password,
         options: {
@@ -201,8 +190,39 @@ export class RegistroPaciente implements OnInit {
         return;
       }
 
+      const newUser = resp.user;
+
+      if (!newUser) {
+        // no hubo error pero tampoco user, caso raro
+        this.toast.error('No se pudo crear el usuario.');
+        return;
+      }
+
+      const { error: ppErr } = await this.sb.rpc('insert_patient_profile', {
+        _email: this.email.trim().toLowerCase(),
+        _nombre: this.nombre.trim(),
+        _apellido: this.apellido.trim(),
+        _edad: this.edad,
+        _dni: this.dni.trim(),
+        _obra_social: this.obra_social.trim(),
+        _avatar_path1: avatarPath1,
+        _avatar_path2: avatarPath2,
+        _uuid: newUser.id
+      });
+
+      if (ppErr) {
+        console.warn('[register] rpc insert_patient_profile error:', ppErr);
+        this.toast.error('No se pudo preparar el registro.');
+        return;
+      }
+
+      if (this.isAdmin()) {
+        this.toast.success('Paciente registrado exitosamente. Un correo fue enviado para confirmar la cuenta.');
+        this.router.navigateByUrl('/usuarios');
+      }else {
       this.toast.success('Un correo fue enviado para confirmar la cuenta. Confirmá tu cuenta y luego iniciá sesión para completar el perfil.');
-      this.router.navigateByUrl('/login');
+      this.router.navigateByUrl('/acceso');
+      }
 
     } finally {
       this.loader.hide();

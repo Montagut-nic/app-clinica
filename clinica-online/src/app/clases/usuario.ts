@@ -1,3 +1,8 @@
+import { Especialista } from "./especialista";
+import { Paciente } from "./paciente";
+
+export type AnyUsuario = Usuario | Paciente | Especialista;
+
 export abstract class Usuario {
     nombre: string;
     apellido: string;
@@ -8,6 +13,7 @@ export abstract class Usuario {
     imagenPrincipalUrl: string;
     categoria: 'paciente' | 'especialista' | 'admin';
     activado: boolean;
+    
     constructor(
         nombre: string,
         apellido: string,
@@ -30,5 +36,4 @@ export abstract class Usuario {
         this.activado = activado;
     }
 
-    abstract save(): void;
 }

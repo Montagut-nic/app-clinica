@@ -1,10 +1,6 @@
 import { Usuario } from "./usuario";
 
 export class Admin extends Usuario {
-    
-    override save(): void {
-        throw new Error("Method not implemented.");
-    }
 
     constructor(
         nombre: string,

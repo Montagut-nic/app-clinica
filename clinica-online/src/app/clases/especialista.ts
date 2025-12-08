@@ -1,12 +1,8 @@
 import { Usuario } from "./usuario";
 
 export class Especialista extends Usuario {
-    
-    override save(): void {
-        throw new Error("Method not implemented.");
-    }
 
-    private especialidades: {id: string, nombre: string}[];
+    especialidades: {id: string, nombre: string}[];
     
     constructor(
         nombre: string,
@@ -16,7 +12,8 @@ export class Especialista extends Usuario {
         email: string,
         authUid: string,
         imagenPrincipalUrl: string,
-        especialidades: {id: string, nombre: string}[]
+        especialidades: {id: string, nombre: string}[],
+        activado: boolean
     ) {
         super(
             nombre,
@@ -26,7 +23,8 @@ export class Especialista extends Usuario {
             email,
             authUid,
             imagenPrincipalUrl,
-            'especialista'
+            'especialista',
+            activado
         );
         this.especialidades = especialidades;
     }

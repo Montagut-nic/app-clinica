@@ -3,19 +3,19 @@ import { NavigationStart, RouterLink, Router, RouterOutlet, NavigationError, Nav
 import { Loader } from './componentes/loader/loader';
 import { LoaderService } from './componentes/loader/loader-service';
 import { SessionService } from './servicios/session';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgIf } from '@angular/common';
 import { ToastsComponent } from "./servicios/toast/toast";
 
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, RouterLink, Loader, CommonModule, ToastsComponent],
+  imports: [RouterOutlet, RouterLink, Loader, CommonModule, ToastsComponent, NgIf],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
 export class App {
   private session = inject(SessionService);
-  protected readonly router = inject(Router);
+  router = inject(Router);
   private readonly loader = inject(LoaderService);
   protected readonly title = document.title;
   private readonly loaderRoutes = ['/inicio','/error404',];
@@ -24,13 +24,6 @@ export class App {
     this.router.events.subscribe(event => {
       if (event instanceof NavigationStart && this.loaderRoutes.includes(event.url)) {
         this.loader.show();
-      }
-       if (
-        event instanceof NavigationEnd ||
-        event instanceof NavigationCancel ||
-        event instanceof NavigationError
-      ) {
-        this.loader.hide?.();
       }
     });
   }
@@ -43,6 +36,6 @@ export class App {
 
   async logout() {
     await this.session.logout();
-    this.router.navigateByUrl('/acceso');
+    this.router.navigateByUrl('/inicio', { replaceUrl: true });
   }
 }

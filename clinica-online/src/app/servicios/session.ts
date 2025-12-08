@@ -6,6 +6,7 @@ import { Admin } from '../clases/admin';
 import { Especialista } from '../clases/especialista';
 import { SpecialtyService } from './specialty';
 import { Paciente } from '../clases/paciente';
+import { AuthService } from './auth';
 
 @Injectable({
   providedIn: 'root'
@@ -18,6 +19,7 @@ export class SessionService {
   private _profile = signal<Usuario | null>(null);
   private _loading = signal(false);
   private _ready = signal(false);
+  private auth = inject(AuthService);
 
   private _initPromise: Promise<void> | null = null;
   private _whenProfileReadyResolvers: Array<() => void> = [];
@@ -78,7 +80,7 @@ export class SessionService {
   private async loadProfile() {
     this._loading.set(true);
     try {
-      const u = this._user();
+      const u = await this.auth.getCurrentUser();
       if (!u) {
         this._profile.set(null);
         return;
@@ -139,7 +141,8 @@ export class SessionService {
             pr._email,
             pr._uuid,
             pr._avatar_path1,
-            specialties
+            specialties,
+            Boolean(pr._is_approved)
           );
         } else if (pr._rol === 'paciente') {
           us = new Paciente (pr._nombre, pr._apellido, Number(pr._edad), pr._dni, pr._obra_social, pr._email, pr._uuid, pr._avatar_path1, pr._avatar_path2);

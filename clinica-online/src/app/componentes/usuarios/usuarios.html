@@ -1,0 +1,246 @@
+<div class="admin-users-page container-fluid px-4 py-4">
+    <div class="row justify-content-center">
+        <div class="col-12">
+            <!-- HEADER -->
+            <div
+                class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-3 gap-2 page-title-bar">
+                <div class="page-header-pill">
+                    <h1 class="h4 mb-1">Administración de usuarios</h1>
+                </div>
+
+                <div class="btn-toolbar gap-2 flex-wrap admin-actions">
+
+                    <button type="button" class="btn btn-success btn-sm d-flex align-items-center gap-1"
+                        (click)="exportExcel()">
+                        <i class="bi bi-file-earmark-excel"></i>
+                        <span>Exportar registros usuarios</span>
+                    </button>
+
+                    <button class="btn btn-outline-secondary btn-sm" (click)="refresh()" [disabled]="loading()">
+                        <span class="spinner-border spinner-border-sm me-1" *ngIf="loading()"></span>
+                        Actualizar
+                    </button>
+
+                    <button class="btn btn-primary btn-sm d-flex align-items-center gap-1" [routerLink]="['/registro']">
+                        <i class="bi bi-person-plus"></i>
+                        <span>Nuevo usuario</span>
+                    </button>
+
+                </div>
+            </div>
+
+            <!-- CARD DE ACCESO RÁPIDO A EXCEL POR USUARIO -->
+            <div class="card shadow-sm quick-export-card mb-3" appHoverElevate>
+                <div class="card-body py-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <div>
+                                <div class="fw-semibold small text-uppercase">
+                                    Descargar turnos por usuario
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="small d-none d-md-block">
+                            Click en un paciente para bajar un excel con los turnos que tomó y con
+                            quién.
+                        </div>
+                    </div>
+
+                    <div class="card-deck">
+                        @for (u of rows(); track $index) {
+                        @if (isPaciente(u)) {
+                        <div class="card fav-user" (click)="exportUserAppointments(u)" [title]="u | fullName">
+                            <img [src]="u | avatar" (error)="imgFallback($event)" class="card-img-top img-fluid"
+                                alt="profile picture" />
+                            <div class="card-body">
+                                <p class="card-text text-justify">{{ u | fullName }}</p>
+                            </div>
+                        </div>
+                        }
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- TABLA (CARD PRINCIPAL) -->
+            <div class="card shadow-sm" appHoverElevate>
+                <div class="card-body p-0">
+                    <div class="table-responsive position-relative users-table-card">
+
+                        <table class="table table-hover align-middle mb-0 users-table">
+                            <thead class="table-light table-sticky">
+                                <tr>
+                                    <th scope="col">Foto</th>
+                                    <th scope="col">Nombre</th>
+                                    <th scope="col">Rol</th>
+                                    <th scope="col">Correo</th>
+                                    <th scope="col">DNI</th>
+                                    <th scope="col">Obra Social</th>
+                                    <th scope="col">Especialidad</th>
+                                    <th scope="col">Aprobado</th>
+                                    <th scope="col" class="text-end">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody *ngIf="!loading() && rows().length > 0; else emptyState">
+                                <tr *ngFor="let r of rows()" class="user-row">
+                                    <!-- FOTO -->
+                                    <td class="text-center">
+                                        <img class="admin-avatar"
+                                            [@avatarZoom]="hoveredId() === r.authUid ? 'zoom' : 'normal'"
+                                            (mouseenter)="hoveredId.set(r.authUid)" (mouseleave)="hoveredId.set(null)"
+                                            [src]="r | avatar" alt="avatar" (error)="imgFallback($event)" />
+                                    </td>
+
+                                    <!-- NOMBRE -->
+                                    <td class="fw-medium">
+                                        <div>{{ r | fullName }}</div>
+                                        <div class="text-muted small" *ngIf="!r.nombre && !r.apellido">
+                                            Sin nombre
+                                        </div>
+                                    </td>
+
+                                    <!-- ROL -->
+                                    <td>
+                                        <span class="badge role-badge" [class.role-admin]="r.categoria === 'admin'"
+                                            [class.role-especialista]="r.categoria === 'especialista'"
+                                            [class.role-paciente]="r.categoria === 'paciente'">
+                                            {{ r.categoria }}
+                                        </span>
+                                    </td>
+
+                                    <!-- EMAIL -->
+                                    <td>
+                                        <span *ngIf="r.email">{{ r.email }}</span>
+                                        <span *ngIf="!r.email">—</span>
+                                    </td>
+
+                                    <!-- DNI -->
+                                    <td>{{ r.dni || "—" }}</td>
+
+                                    <!-- OBRA SOCIAL -->
+                                    <td>{{ isPaciente(r) ? r.obraSocial : "—" }}</td>
+
+                                    <!-- ESPECIALIDAD -->
+                                    <td>
+                                        <ng-container *ngIf="isEspecialista(r); else guion">
+                                            <ng-container *ngIf="r.especialidades.length > 0; else noSpecs">
+                                                <span class="badge rounded-pill text-bg-light me-1 speciality-pill"
+                                                    *ngFor="let s of r.especialidades">
+                                                    {{ s.nombre }}
+                                                </span>
+                                            </ng-container>
+                                            <ng-template #noSpecs>—</ng-template>
+                                        </ng-container>
+                                        <ng-template #guion>—</ng-template>
+                                    </td>
+
+                                    <!-- APROBADO -->
+                                    <td>
+                                        <span class="badge status-badge" [class.status-ok]="r.activado"
+                                            [class.status-pending]="!r.activado">
+                                            {{ r.activado ? "Sí" : "Pendiente" }}
+                                        </span>
+                                    </td>
+
+                                    <!-- ACCIONES -->
+                                    <td class="text-end">
+                                        <div *ngIf="isEspecialista(r)" class="btn-group btn-group-sm" ngbDropdown
+                                            placement="bottom-end">
+                                            <button type="button" class="btn btn-outline-success"
+                                                (click)="toggleApprove(r)">
+                                                {{ r.activado ? "Desaprobar" : "Aprobar" }}
+                                            </button>
+                                        </div>
+
+                                        <button class="btn btn-sm btn-outline-primary ms-2" *ngIf="isPaciente(r)"
+                                            (click)="openHistory(r)">
+                                            Historia
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <ng-template #emptyState>
+                            <div class="p-4 text-center">
+                                <div class="mb-2">
+                                    No hay usuarios que coincidan con el filtro.
+                                </div>
+                                <div class="small">
+                                    Cambiá la búsqueda o los filtros para ver resultados.
+                                </div>
+                            </div>
+                        </ng-template>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL HISTORIA CLÍNICA (ADMIN) -->
+    <div class="modal fade show d-block" tabindex="-1" *ngIf="showHistory()">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        Historia clínica – {{ historyPatientName() }}
+                    </h5>
+                    <button type="button" class="btn-close" (click)="closeHistory()"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div *ngIf="historyLoading()" class="text-muted">
+                        Cargando historia clínica…
+                    </div>
+
+                    <div *ngIf="!historyLoading() && !historyRows().length" class="text-center">
+                        No hay historias clínicas cargadas para este paciente.
+                    </div>
+
+                    <div *ngIf="!historyLoading() && historyRows().length">
+                        <div *ngFor="let h of historyRows()" class="border rounded p-3 mb-3 small">
+                            <div class="fw-semibold mb-1">
+                                {{ h.fecha | date : "dd/MM/yyyy" }} –
+                                {{ h.hora | date : "HH:mm" }}
+                            </div>
+                            <div class="mb-1">
+                                <strong>Especialista:</strong>
+                                {{ h.especialista_nombre || "—" }}
+                            </div>
+                            <div class="mb-1">
+                                <strong>Especialidad:</strong>
+                                {{ h.especialidad_nombre || "—" }}
+                            </div>
+
+                            <div class="mb-1">
+                                <strong>Altura:</strong> {{ h.altura || "—" }} ·
+                                <strong>Peso:</strong> {{ h.peso || "—" }}
+                            </div>
+                            <div class="mb-1">
+                                <strong>Temperatura:</strong> {{ h.temperatura || "—" }} ·
+                                <strong>Presión:</strong> {{ h.presion || "—" }}
+                            </div>
+
+                            <div *ngIf="h.extras.length">
+                                <strong>Datos adicionales:</strong>
+                                <ul class="mb-0">
+                                    <li *ngFor="let e of h.extras">{{ e.key }}: {{ e.valor }}</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" style="color: black;" (click)="closeHistory()">
+                        Cerrar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- backdrop para HISTORIA -->
+        <div class="modal-backdrop-custom"></div>
+    </div>
+</div>

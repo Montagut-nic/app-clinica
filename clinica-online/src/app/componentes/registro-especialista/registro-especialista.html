@@ -1,11 +1,14 @@
 <div class="container py-4">
-    <a
-        routerLink="/inicio"
-        class="volver-button"
-        aria-label="Volver a la página de inicio"
-      >
+    @if (this.isAdmin()) {
+    <a routerLink="/usuarios" class="volver-button" aria-label="Volver a la página de administrar usuarios">
+        Volver a Administrar Usuarios
+    </a>
+    } @else {
+    <a routerLink="/inicio" class="volver-button" aria-label="Volver a la página de inicio">
         Volver al inicio
-      </a>
+    </a>
+    }
+
     <div class="card shadow-sm">
         <div class="card-header bg-light d-flex align-items-center gap-2">
             <i class="bi bi-person-plus"></i>
