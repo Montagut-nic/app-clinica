@@ -1,0 +1,1 @@
+import{Pa as t,ib as r,jb as s,yb as a}from"./chunk-TOHV62XN.js";var i=class e{static \u0275fac=function(o){return new(o||e)};static \u0275cmp=t({type:e,selectors:[["app-horarios"]],decls:2,vars:0,template:function(o,p){o&1&&(r(0,"p"),a(1,"horarios works!"),s())},encapsulation:2})};export{i as Horarios};

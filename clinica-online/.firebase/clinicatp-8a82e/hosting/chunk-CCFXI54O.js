@@ -1,0 +1,1 @@
+import{Pa as t,ib as n,jb as o,yb as p}from"./chunk-TOHV62XN.js";var r=class i{static \u0275fac=function(e){return new(e||i)};static \u0275cmp=t({type:i,selectors:[["app-mi-perfil"]],decls:2,vars:0,template:function(e,l){e&1&&(n(0,"p"),p(1,"mi-perfil works!"),o())},encapsulation:2})};export{r as MiPerfil};

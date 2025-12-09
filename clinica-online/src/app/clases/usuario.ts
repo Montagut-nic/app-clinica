@@ -1,7 +1,8 @@
+import { Admin } from "./admin";
 import { Especialista } from "./especialista";
 import { Paciente } from "./paciente";
 
-export type AnyUsuario = Usuario | Paciente | Especialista;
+export type AnyUsuario = Usuario | Paciente | Especialista | Admin;
 
 export abstract class Usuario {
     nombre: string;

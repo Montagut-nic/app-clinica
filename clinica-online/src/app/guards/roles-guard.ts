@@ -1,17 +1,20 @@
 import { CanActivateFn, Router } from '@angular/router';
-import { SessionService } from '../servicios/session';
+
 import { inject } from '@angular/core';
+import { SupabaseClientService } from '../servicios/supabase-client';
 
 export const rolesGuard: CanActivateFn = async (route, state) => {
   const router = inject(Router);
-  const session = inject(SessionService);
+  const supa = inject(SupabaseClientService);
 
-  await session.waitReady();
-  await session.waitForProfile();
+  const logged = await supa.isLoggedIn();
 
-  const perfil = session.profile();
-  const user = session.user;
-  if (!user || !perfil) {
+  if (!logged) {
+    return router.createUrlTree(['/inicio']);
+  }
+
+  const perfil = supa.profile;
+  if (!perfil) {
     return router.createUrlTree(['/inicio']);
   }
 
@@ -53,9 +56,4 @@ export const rolesGuard: CanActivateFn = async (route, state) => {
     return router.createUrlTree(['/mi-perfil']);
   }
 
-
-
-
-
-  return true;
 };

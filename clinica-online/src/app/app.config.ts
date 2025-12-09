@@ -1,15 +1,10 @@
-import { APP_INITIALIZER, ApplicationConfig, inject, provideBrowserGlobalErrorListeners, provideZoneChangeDetection } from '@angular/core';
+import { ApplicationConfig, importProvidersFrom, provideBrowserGlobalErrorListeners, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import { initializeApp } from 'firebase/app';
-import { firebaseConfig } from '../environments/environment';
-import { SessionService } from './servicios/session';
-import { provideAnimations } from '@angular/platform-browser/animations';
-
-export function initAuth() {
-  const session = inject(SessionService);
-  return () => session.hydrate();
-}
+import { firebaseConfig, supabaseKey, supabaseUrl } from '../environments/environment';
+import { BrowserAnimationsModule, provideAnimations } from '@angular/platform-browser/animations';
+import { createClient } from '@supabase/supabase-js';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -17,13 +12,9 @@ export const appConfig: ApplicationConfig = {
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     provideAnimations(),
-    {
-      provide: APP_INITIALIZER,
-      useFactory: initAuth,
-      multi: true
-    }
+    importProvidersFrom(BrowserAnimationsModule),
   ]
 };
 
-export const app = initializeApp(firebaseConfig);
+ const app = initializeApp(firebaseConfig);
 

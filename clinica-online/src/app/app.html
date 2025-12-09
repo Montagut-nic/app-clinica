@@ -6,7 +6,6 @@
 
     <div class="ms-auto d-flex align-items-center gap-2">
       <ng-container *ngIf="
-          ready() &&
             isLogged() &&
             !(
               profile()?.categoria === 'especialista' &&
@@ -17,7 +16,7 @@
         <span>
           Hola, {{ profile()?.nombre || "Usuario" }}
         </span>
-        @if(profile()?.categoria === 'admin') {
+        @if( isAdmin() ) {
         <a class="btn btn-outline-primary btn-sm" routerLink="/usuarios">
           Usuarios
         </a>

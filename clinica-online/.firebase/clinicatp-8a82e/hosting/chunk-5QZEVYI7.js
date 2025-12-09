@@ -1,0 +1,1 @@
+import{Pa as e,ib as i,jb as n,yb as r}from"./chunk-TOHV62XN.js";var a=class o{static \u0275fac=function(t){return new(t||o)};static \u0275cmp=e({type:o,selectors:[["app-solicitar-turno"]],decls:2,vars:0,template:function(t,c){t&1&&(i(0,"p"),r(1,"solicitar-turno works!"),n())},encapsulation:2})};export{a as SolicitarTurno};

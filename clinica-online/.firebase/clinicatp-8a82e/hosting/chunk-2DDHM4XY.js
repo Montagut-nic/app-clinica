@@ -1,0 +1,1 @@
+import{Pa as n,ib as o,jb as s,yb as r}from"./chunk-TOHV62XN.js";var a=class t{static \u0275fac=function(e){return new(e||t)};static \u0275cmp=n({type:t,selectors:[["app-turnos"]],decls:2,vars:0,template:function(e,p){e&1&&(o(0,"p"),r(1,"turnos works!"),s())},encapsulation:2})};export{a as Turnos};

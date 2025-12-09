@@ -1,13 +1,12 @@
-import { Component, ElementRef, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { LoaderService } from '../loader/loader-service';
 import { Router } from '@angular/router';
 import { AuthService } from '../../servicios/auth';
-import { SessionService } from '../../servicios/session';
-import { SpecialtyService } from '../../servicios/specialty';
 import { SupabaseClientService } from '../../servicios/supabase-client';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ToastService } from '../../servicios/toast';
+import { AnyUsuario } from '../../clases/usuario';
 
 interface QuickUser {
   email: string;
@@ -25,11 +24,10 @@ export class Login implements OnInit {
 
   private auth = inject(AuthService);
   private router = inject(Router);
-  private session = inject(SessionService);
   private loader = inject(LoaderService);
-  private sb = inject(SupabaseClientService).client;
-  private specialtySvc = inject(SpecialtyService);
+  private supa = inject(SupabaseClientService);
   private toast = inject(ToastService);
+  private profile = signal <AnyUsuario | null>(null);
 
   quickUsers: QuickUser[] = [
     {
@@ -161,18 +159,19 @@ export class Login implements OnInit {
         }
         return;
       }
-
-      await this.session.refresh();
-
-      const prof = this.session.profile();
       
-      if (!prof) {
-        this.router.navigateByUrl('/mi-perfil', { replaceUrl: true });
-        return;
-      }
+      await this.supa.loadProfile().then(() => {
+        this.profile.set(this.supa.profile);
+      });
 
-      if (prof.categoria === 'admin') this.router.navigateByUrl('/usuarios', { replaceUrl: true });
-      else this.router.navigateByUrl('/mi-perfil', { replaceUrl: true });
+
+      if (!this.profile()) {
+        this.router.navigateByUrl('/mi-perfil', { replaceUrl: true });
+      } else if (this.profile()?.categoria === 'admin') { 
+        this.router.navigateByUrl('/usuarios', { replaceUrl: true }); 
+      } else { 
+        this.router.navigateByUrl('/mi-perfil', { replaceUrl: true });
+      }
     } finally {
       this.loader.hide();
     }

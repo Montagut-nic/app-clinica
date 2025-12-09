@@ -1,0 +1,1 @@
+import{Pa as t,ib as i,jb as a,yb as n}from"./chunk-TOHV62XN.js";var o=class s{static \u0275fac=function(e){return new(e||s)};static \u0275cmp=t({type:s,selectors:[["app-mis-turnos-especialista"]],decls:2,vars:0,template:function(e,c){e&1&&(i(0,"p"),n(1,"mis-turnos-especialista works!"),a())},encapsulation:2})};export{o as MisTurnosEspecialista};

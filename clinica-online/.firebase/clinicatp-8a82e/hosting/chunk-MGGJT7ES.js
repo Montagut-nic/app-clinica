@@ -1,0 +1,1 @@
+import{Pa as t,ib as o,jb as s,yb as m}from"./chunk-TOHV62XN.js";var i=class n{static \u0275fac=function(e){return new(e||n)};static \u0275cmp=t({type:n,selectors:[["app-informes"]],decls:2,vars:0,template:function(e,a){e&1&&(o(0,"p"),m(1,"informes works!"),s())},encapsulation:2})};export{i as Informes};
